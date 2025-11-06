@@ -39,11 +39,16 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Install and build React
 WORKDIR /app/react
+COPY react/package.json react/package-lock.json* ./
+RUN npm install
 
 COPY . .
 
 RUN npm run build
 WORKDIR /app
+
+# Move React build to the target directory
+RUN mv /app/react/build /app/react_build
 
 # Collect static files
 RUN python manage.py collectstatic --noinput
