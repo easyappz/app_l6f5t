@@ -1,32 +1,19 @@
-openapi: 3.0.3
+openapi: 3.0.0
 info:
-  title: Easyapp API
+  title: User Registration and Authentication API
   version: 1.0.0
-  description: API documentation for easyapp
+  description: API for user registration, authentication, and profile management
+
+servers:
+  - url: /api
+    description: API server
+
 paths:
-  /api/hello/:
-    get:
-      operationId: api_hello_retrieve
-      description: Get a hello world message
-      tags:
-      - api
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
-          description: ''
-  /api/register/:
+  /register/:
     post:
-      operationId: api_register_create
-      description: Register a new user
+      summary: Register a new user
       tags:
-      - auth
+        - Authentication
       requestBody:
         required: true
         content:
@@ -42,16 +29,18 @@ paths:
                 email:
                   type: string
                   format: email
+                  example: user@example.com
                 first_name:
                   type: string
-                  maxLength: 150
+                  example: Иван
                 last_name:
                   type: string
-                  maxLength: 150
+                  example: Иванов
                 password:
                   type: string
-                  minLength: 8
                   format: password
+                  minLength: 8
+                  example: password123
       responses:
         '201':
           description: User registered successfully
@@ -62,15 +51,19 @@ paths:
                 properties:
                   token:
                     type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
                   user:
                     type: object
                     properties:
                       email:
                         type: string
+                        example: user@example.com
                       first_name:
                         type: string
+                        example: Иван
                       last_name:
                         type: string
+                        example: Иванов
         '400':
           description: Validation error
           content:
@@ -80,12 +73,12 @@ paths:
                 properties:
                   errors:
                     type: object
-  /api/login/:
+
+  /login/:
     post:
-      operationId: api_login_create
-      description: Authenticate user and return token
+      summary: Login user
       tags:
-      - auth
+        - Authentication
       requestBody:
         required: true
         content:
@@ -99,9 +92,11 @@ paths:
                 email:
                   type: string
                   format: email
+                  example: user@example.com
                 password:
                   type: string
                   format: password
+                  example: password123
       responses:
         '200':
           description: Login successful
@@ -112,24 +107,19 @@ paths:
                 properties:
                   token:
                     type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
                   user:
                     type: object
                     properties:
                       email:
                         type: string
+                        example: user@example.com
                       first_name:
                         type: string
+                        example: Иван
                       last_name:
                         type: string
-        '400':
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  errors:
-                    type: object
+                        example: Иванов
         '401':
           description: Authentication failed
           content:
@@ -139,12 +129,22 @@ paths:
                 properties:
                   error:
                     type: string
-  /api/logout/:
+                    example: Неверный email или пароль.
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+
+  /logout/:
     post:
-      operationId: api_logout_create
-      description: Logout user
+      summary: Logout user
       tags:
-      - auth
+        - Authentication
       security:
         - bearerAuth: []
       responses:
@@ -157,14 +157,23 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: Выход выполнен успешно.
         '401':
           description: Unauthorized
-  /api/profile/:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: Authentication credentials were not provided.
+
+  /profile/:
     get:
-      operationId: api_profile_retrieve
-      description: Get authenticated user profile
+      summary: Get user profile
       tags:
-      - profile
+        - Profile
       security:
         - bearerAuth: []
       responses:
@@ -177,17 +186,27 @@ paths:
                 properties:
                   email:
                     type: string
+                    example: user@example.com
                   first_name:
                     type: string
+                    example: Иван
                   last_name:
                     type: string
+                    example: Иванов
         '401':
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: Authentication credentials were not provided.
     patch:
-      operationId: api_profile_update
-      description: Update authenticated user profile
+      summary: Update user profile
       tags:
-      - profile
+        - Profile
       security:
         - bearerAuth: []
       requestBody:
@@ -199,10 +218,10 @@ paths:
               properties:
                 first_name:
                   type: string
-                  maxLength: 150
+                  example: Иван
                 last_name:
                   type: string
-                  maxLength: 150
+                  example: Иванов
       responses:
         '200':
           description: Profile updated successfully
@@ -213,10 +232,13 @@ paths:
                 properties:
                   email:
                     type: string
+                    example: user@example.com
                   first_name:
                     type: string
+                    example: Иван
                   last_name:
                     type: string
+                    example: Иванов
         '400':
           description: Validation error
           content:
@@ -228,30 +250,19 @@ paths:
                     type: object
         '401':
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: Authentication credentials were not provided.
+
 components:
-  schemas:
-    Message:
-      type: object
-      properties:
-        message:
-          type: string
-          maxLength: 200
-        timestamp:
-          type: string
-          format: date-time
-          readOnly: true
-      required:
-      - message
-      - timestamp
   securitySchemes:
-    basicAuth:
-      type: http
-      scheme: basic
-    cookieAuth:
-      type: apiKey
-      in: cookie
-      name: sessionid
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+      description: JWT token for authentication. Use format - Bearer <token>
