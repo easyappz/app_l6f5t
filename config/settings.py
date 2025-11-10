@@ -33,9 +33,20 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 
-# CORS settings (если нужно разрешить кросс-доменные запросы)
-CORS_ALLOW_ALL_ORIGINS = True  # Только для разработки!
+# CORS settings
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
 
 CSRF_TRUSTED_ORIGINS = ["https://*.easyappz.ru/", "http://localhost:8080", "https://easyappz.ru/"]
 
@@ -64,10 +75,15 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Third party
     "rest_framework",
+    "rest_framework.authtoken",
+    "corsheaders",
     "drf_spectacular",
     # Local
     "api",
 ]
+
+# Custom User Model
+AUTH_USER_MODEL = "api.Member"
 
 # REST Framework configuration
 REST_FRAMEWORK = {
@@ -95,6 +111,7 @@ SPECTACULAR_SETTINGS = {
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -132,10 +149,6 @@ DATABASES = {
         "NAME": BASE_DIR / "persistent" / "db" / "db.sqlite3",
     }
 }
-
-
-# Custom User Model
-AUTH_USER_MODEL = "api.Member"
 
 
 # Password validation
